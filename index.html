@@ -1,0 +1,113 @@
+<!doctype html> 
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Test Game 1</title>
+    <script type="text/javascript" src = "phaser.min.js"></script>
+
+</head>
+<body>
+    <script type="text/javascript">
+
+var game = new Phaser.Game(800,600,Phaser.AUTO,'',{
+    preload: preload, create: create, update:update, render: render 
+});
+
+function preload(){
+    game.load.image('sky', 'images/sky.png');
+    game.load.image('city', 'images/city.png');
+    game.load.image('ground', 'images/grass.jpg');
+
+    //game.load.spritesheet('plrSprite','images/sprMan.png', 120, 148);
+    //game.load.spritesheet('plrSprite','images/player.png', 200, 240);
+    //game.load.spritesheet('plrSprite','images/player1.png', 200, 240);
+    //game.load.spritesheet('plrSprite','images/player2.png', 100, 120);
+    game.load.spritesheet('plrSprite','images/player_run_jump.png', 100, 120);
+
+    game.load.image('box', 'images/box.jpg');
+}
+
+var platforms,stars,player,cursors,score,scoreTxt,box;
+
+function create(){
+
+    game.physics.startSystem(Phaser.Physics.ARCADE); // init Physics
+    game.add.sprite(0,0,'sky');
+    bg = game.add.tileSprite(0, game.world.height - 482, game.world.width, game.world.height, "city");
+    bg.autoScroll(-50, 0);
+
+
+    platforms = game.add.group();
+    platforms.enableBody = true; // Enabling Physics
+
+    // The Base Ground
+    var ground = game.add.tileSprite(0, game.world.height - 64,game.world.width,64,'ground');
+    ground.autoScroll(-350,0);
+    platforms.add(ground);
+    //ground.scale.setTo(200,2);
+    ground.body.immovable = true;
+
+    box = game.add.tileSprite(1500, game.world.height - 164,600,100,'box');
+    platforms.add(box);
+    //box.body.collideWorldBounds = true;
+    box.body.immovable = true;
+    //box.body.x = 2000;
+
+    // Add the Player
+    player = game.add.sprite(game.world.width/2 - 100,game.world.height - 400,'plrSprite');
+    game.physics.arcade.enable(player);
+
+    //player.body.bounce.y = 0.2;
+    player.body.gravity.y = 600;
+    player.body.collideWorldBounds = true;
+
+    // Run Animation
+    player.animations.add('run',game.math.numberArray(0,16),35,true);
+    player.animations.play('run');
+
+    // Jump Animation
+    player.animations.add('jump',[18,17],1,false);
+    // player.animations.play('jump');
+
+}
+
+function update(){
+
+    game.physics.arcade.collide(player, platforms);
+    game.physics.arcade.overlap(player, box, plrDie);
+    box.body.x -= 5;
+    //console.log(box.body.x);
+
+    //game.camera.x--;
+
+    // move the player
+    if(!player.body.touching.down)
+    {
+        player.animations.play('jump');
+    }
+    else
+    {
+        player.animations.play('run');
+    }
+    if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) && player.body.touching.down){
+        player.body.velocity.y = -350;
+    }
+
+}
+
+
+function plrDie(){
+    console.log("Die");
+}
+
+
+function render(){
+
+    //game.debug.body(player);
+    //game.debug.body(box);
+}
+
+    
+    </script>
+</body>
+</html>
